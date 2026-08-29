@@ -1,7 +1,7 @@
 class Livro:
-    def __init__(self, id_livro, nome_livro, autor, quantidade_disponivel):
+    def __init__(self, id_livro, titulo_livro, autor, quantidade_disponivel):
         self.id = id_livro
-        self.nome_livro = nome_livro
+        self.titulo_livro = titulo_livro
         self.autor = autor
         self.quantidade_disponivel = quantidade_disponivel
 
