@@ -44,3 +44,12 @@ cursor.execute('''
 
 conn.commit()
 conn.close()
+
+def cadastrar_usuario(nome, email):
+    cursor.execute('''
+    INSERT INTO usuarios(
+    nome, email
+    ) VALUES (?, ?)
+''',
+(nome, email)
+)
