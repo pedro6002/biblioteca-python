@@ -55,7 +55,7 @@ def cadastrar_usuario(nome, email):
     ) VALUES (?, ?)
 ''',
 (nome, email)
-)
+    )
     conn.commit()
     conn.close()
 
@@ -64,11 +64,30 @@ def verificar_multa(id_usuario):
     cursor = conn.cursor()
 
     cursor.execute('''
-    SELECT SUM(multa) FROM emprestimo
-    WHERE id_usuario = ? AND multa > 0
+    SELECT SUM(multa) FROM emprestimo WHERE id_usuario = ? AND multa > 0
 ''',
 (id_usuario,)
-)
+    )
     resultado = cursor.fetchone()[0]
     conn.close
     return resultado if resultado else 0.0
+
+def emprestar_livro(id_usuario, id_livro, data_entrega):
+    multa_pendente = verificar_multa(id_usuario)
+    if multa_pendente > 0:
+        return f"Não foi possivel realizar o empréstimo, o usuário possui multa de {multa_pendente:.2f} reais."
+    
+    conn = sqlite3.connect("biblioteca.db")
+    cursor = conn.cursor()
+
+    cursor.execute('''
+    INSERT INTO emprestimo (
+        id_usuario, id_livro, data_entrega, multa, disponibilidade
+    ) VALUES (?, ?, ?, 0.0, 1)
+''', (id_usuario, id_livro, data_entrega)
+    )
+
+    cursor.execute('''
+    UPDATE livros SET quantidade_disponivel = quantidade_disponivel - 1 WHERE id_livro = ?
+    ''', (id_livro,)
+    )
