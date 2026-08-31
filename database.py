@@ -46,10 +46,29 @@ conn.commit()
 conn.close()
 
 def cadastrar_usuario(nome, email):
+    conn = sqlite3.connect("biblioteca.db")
+    cursor = conn.cursor()
+
     cursor.execute('''
     INSERT INTO usuarios(
-    nome, email
+        nome, email
     ) VALUES (?, ?)
 ''',
 (nome, email)
 )
+    conn.commit()
+    conn.close()
+
+def verificar_multa(id_usuario):
+    conn = sqlite3.connect("biblioteca.db")
+    cursor = conn.cursor()
+
+    cursor.execute('''
+    SELECT SUM(multa) FROM emprestimo
+    WHERE id_usuario = ? AND multa > 0
+''',
+(id_usuario,)
+)
+    resultado = cursor.fetchone()[0]
+    conn.close
+    return resultado if resultado else 0.0
