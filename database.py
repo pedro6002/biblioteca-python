@@ -84,10 +84,30 @@ def emprestar_livro(id_usuario, id_livro, data_entrega):
     INSERT INTO emprestimo (
         id_usuario, id_livro, data_entrega, multa, disponibilidade
     ) VALUES (?, ?, ?, 0.0, 1)
-''', (id_usuario, id_livro, data_entrega)
+    ''', (id_usuario, id_livro, data_entrega)
     )
 
     cursor.execute('''
     UPDATE livros SET quantidade_disponivel = quantidade_disponivel - 1 WHERE id_livro = ?
     ''', (id_livro,)
     )
+    conn.commit()
+    conn.close()
+    return "Livro emprestado com sucesso!"
+
+def devolver_livro(id_usuario, id_livro):
+    conn = sqlite3.connect("biblioteca.db")
+    cursor = conn.cursor()
+    #atualiza a tabela de livros, aumentando oa quantidade do id do livro emprestado
+    cursor.execute('''
+    UPDATE livros SET quantidade_disponivel = quantidade_disponivel + 1 WHERE id_livro = ?
+    ''', (id_livro,)
+    )
+    #atualiza a tabela de emprestimo, retirando o livro do usuario
+    cursor.execute('''
+    UPDATE emprestimo SET disponibilidade = 0 WHERE id_usuario = ? AND id_livro = ? AND disponibilidade = 1
+    ''' , (id_usuario, id_livro)
+    )
+    conn.commit()
+    conn.close()
+    return "Livro devolvido com sucesso!"   
