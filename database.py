@@ -110,4 +110,4 @@ def devolver_livro(id_usuario, id_livro):
     )
     conn.commit()
     conn.close()
-    return "Livro devolvido com sucesso!"   
+    return "Livro devolvido com sucesso!"  
