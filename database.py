@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 import sqlite3
 
 def criar_tabelas():
@@ -53,6 +54,16 @@ def cadastrar_usuario(nome, email):
     cursor = conn.cursor()
 
     cursor.execute('''
+    SELECT email FROM usuarios
+    WHERE email = ?
+    ''', (email,)
+    )
+    usuario_cadastrado = cursor.fetchone()
+    if usuario_cadastrado:
+        conn.close()
+        return "O usuário com esse email já existe!"
+
+    cursor.execute('''
     INSERT INTO usuarios(
         nome, email
     ) VALUES (?, ?)
@@ -64,12 +75,14 @@ def cadastrar_usuario(nome, email):
     return "Usuário cadastrado com sucesso!"
 
 def verificar_multa(id_usuario):
-    
+
     conn = sqlite3.connect("biblioteca.db")
     cursor = conn.cursor()
 
     cursor.execute('''
-    SELECT SUM(multa) FROM emprestimo WHERE id_usuario = ? AND multa > 0
+    SELECT SUM(multa)
+    FROM emprestimo
+    WHERE id_usuario = ? AND multa > 0
     ''',
     (id_usuario,)
     )
@@ -77,8 +90,11 @@ def verificar_multa(id_usuario):
     conn.close
     return resultado if resultado else 0.0
 
-def emprestar_livro(id_usuario, id_livro, data_entrega):
+def emprestar_livro(id_usuario, id_livro):
 
+    data_entrega = (datetime.now() + timedelta(days=17)).strftime("%d-%m-%Y")
+
+    #Verifica se o usuário tem multa pendente, negando o empréstimo
     multa_pendente = verificar_multa(id_usuario)
     if multa_pendente > 0:
         return f"Não foi possivel realizar o empréstimo, o usuário possui multa de {multa_pendente:.2f} reais."
@@ -87,12 +103,34 @@ def emprestar_livro(id_usuario, id_livro, data_entrega):
     cursor = conn.cursor()
 
     cursor.execute('''
+    SELECT id_emprestimo FROM emprestimo 
+    WHERE id_usuario = ? AND id_livro = ? AND disponibilidade = 1
+    ''', (id_usuario, id_livro))
+    emprestimo_ativo = cursor.fetchone()
+
+    if emprestimo_ativo:
+        conn.close()
+        return "O livro já está emprestado no seu nome!"
+
+    cursor.execute('''
+    SELECT quantidade_disponivel FROM livros WHERE id_livro = ?
+    ''', (id_livro,)
+    )
+    checagem = cursor.fetchone()
+
+    #Checa se o livro existe e se está disponivel
+    if not checagem or checagem[0] <= 0:
+        conn.close()
+        return "Não foi possivel realizar o empréstimo, livro indisponível no momento."
+
+    cursor.execute('''
     INSERT INTO emprestimo (
-        id_usuario, id_livro, data_entrega, multa, disponibilidade
+    id_usuario, id_livro, data_entrega, multa, disponibilidade
     ) VALUES (?, ?, ?, 0.0, 1)
     ''', (id_usuario, id_livro, data_entrega)
     )
 
+    #Atualiza a tabela, colocando a quantidade disponivel em 0
     cursor.execute('''
     UPDATE livros SET quantidade_disponivel = quantidade_disponivel - 1 WHERE id_livro = ?
     ''', (id_livro,)
@@ -102,10 +140,11 @@ def emprestar_livro(id_usuario, id_livro, data_entrega):
     return "Livro emprestado com sucesso!"
 
 def devolver_livro(id_usuario, id_livro):
+
     conn = sqlite3.connect("biblioteca.db")
     cursor = conn.cursor()
 
-    #Atualiza a tabela de livros, aumentando oa quantidade do id do livro emprestado
+    #Atualiza a tabela de livros, aumentando a quantidade do id do livro emprestado
     cursor.execute('''
     UPDATE livros SET quantidade_disponivel = quantidade_disponivel + 1 WHERE id_livro = ?
     ''', (id_livro,)
@@ -113,9 +152,55 @@ def devolver_livro(id_usuario, id_livro):
 
     #Atualiza a tabela de emprestimo, retirando o livro do usuario
     cursor.execute('''
-    UPDATE emprestimo SET disponibilidade = 0 WHERE id_usuario = ? AND id_livro = ? AND disponibilidade = 1
+    UPDATE emprestimo
+    SET disponibilidade = 0
+    WHERE id_usuario = ?
+    AND id_livro = ?
+    AND disponibilidade = 1
     ''' , (id_usuario, id_livro)
     )
     conn.commit()
     conn.close()
-    return "Livro devolvido com sucesso!"   
+    return "Livro devolvido com sucesso!" 
+
+def cadastrar_livro(titulo, autor):
+
+    conn = sqlite3.connect("biblioteca.db")
+    cursor = conn.cursor()
+    cursor.execute('''
+    INSERT INTO livros(
+    titulo_livro, autor
+    ) VALUES (?, ?)
+    ''', (titulo, autor)
+    )
+    conn.commit()
+    conn.close()
+    return "Livro cadastrado com sucesso!"  
+
+def visualizar_livros():
+
+    conn = sqlite3.connect("biblioteca.db")
+
+    #Acessa os dados pelo nome das colunas
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute('''
+    SELECT id_livro, autor, titulo_livro, quantidade_disponivel FROM livros
+    ''')
+    leitura = cursor.fetchall()
+    cursor.close()
+
+    #Transforma os valores da tabela [( )] em dicionario { }
+    return [dict(leituras) for leituras in leitura]
+
+def visualizar_emprestimos():
+
+    conn = sqlite3.connect("biblioteca.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute('''
+    SELECT id_emprestimo, id_livro, data_entrega, multa, disponibilidade FROM emprestimo
+    ''')
+    visualizacao = cursor.fetchall()
+    cursor.close()
+    return [dict(visualizacoes) for visualizacoes in visualizacao]
