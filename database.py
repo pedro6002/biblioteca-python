@@ -2,15 +2,17 @@ from datetime import datetime, timedelta
 import sqlite3
 
 def criar_tabelas():
-    #cria uma conexão com o sqlite e cria a tabela "biblioteca" caso ela não exista
+    
+    #Cria uma conexão com o sqlite e cria a tabela "biblioteca" caso ela não exista
     conn = sqlite3.connect("biblioteca.db")
-    #ativa as chaves estrangeiras (são desativadas por padrão) antes de abrir o banco de dados
+
+    #Ativa as chaves estrangeiras (são desativadas por padrão) antes de abrir o banco de dados
     conn.execute("PRAGMA foreign_keys = ON;")
 
-    #cria um cursor para realizar os comandos no SQL 
+    #Cria um cursor para realizar os comandos no SQL 
     cursor = conn.cursor()
 
-    #cria a tabela de livros e passa os atributos da tabela
+    #Cria a tabela de livros e passa os atributos da tabela
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS livros (
         id_livro INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -86,13 +88,14 @@ def verificar_multa(id_usuario):
     ''',
     (id_usuario,)
     )
-    resultado = cursor.fetchone()[0]
+    checagem = cursor.fetchone()[0]
     conn.close
-    return resultado if resultado else 0.0
+    return checagem if checagem else 0.0
 
 def emprestar_livro(id_usuario, id_livro):
 
-    data_entrega = (datetime.now() + timedelta(days=17)).strftime("%d-%m-%Y")
+    #Função para colocar data, evitando do usuário colocar data de entrega como parâmetro
+    data_entrega = (datetime.now() + timedelta(days=7)).strftime("%d-%m-%Y")
 
     #Verifica se o usuário tem multa pendente, negando o empréstimo
     multa_pendente = verificar_multa(id_usuario)
@@ -163,7 +166,7 @@ def devolver_livro(id_usuario, id_livro):
     conn.close()
     return "Livro devolvido com sucesso!" 
 
-def cadastrar_livro(titulo, autor):
+def cadastrar_livro(titulo_livro, autor):
 
     conn = sqlite3.connect("biblioteca.db")
     cursor = conn.cursor()
@@ -171,13 +174,13 @@ def cadastrar_livro(titulo, autor):
     INSERT INTO livros(
     titulo_livro, autor
     ) VALUES (?, ?)
-    ''', (titulo, autor)
+    ''', (titulo_livro, autor)
     )
     conn.commit()
     conn.close()
     return "Livro cadastrado com sucesso!"  
 
-def visualizar_livros():
+def visualizar_livro():
 
     conn = sqlite3.connect("biblioteca.db")
 
@@ -193,7 +196,7 @@ def visualizar_livros():
     #Transforma os valores da tabela [( )] em dicionario { }
     return [dict(leituras) for leituras in leitura]
 
-def visualizar_emprestimos():
+def visualizar_emprestimo():
 
     conn = sqlite3.connect("biblioteca.db")
     conn.row_factory = sqlite3.Row
