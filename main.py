@@ -30,26 +30,26 @@ def menu(inicio):
 
     while True:
         inicio()
-        opcao = input('Escolha uma opção: ')
+        opcao = input('Escolha uma opção: ').strip()
         match opcao:
-            case 1:
+            case '1':
                 nome = input('Nome completo: ')
                 email = input('Email: ')
                 novo_usuario = Usuario(nome=nome, email=email)
                 print(database.cadastrar_usuario(novo_usuario.nome, novo_usuario.email))
 
-            case 2:
+            case '2':
                 usuarios = database.visualizar_usuario()
                 for usuario in usuarios:
                     print(f'ID do usuário: {usuario['id_usuario']} | Nome: {usuario['nome']} | Email: {usuario['email']}')
 
-            case 3:
+            case '3':
                 nome_livro = input('Nome do livro: ')
                 autor = input('Autor(a): ')
                 novo_livro = Livro(nome_livro = nome_livro, autor = autor)
                 print(database.cadastrar_livro(novo_livro.nome_livro, novo_livro.autor))
 
-            case 4:
+            case '4':
                 dados_livros = database.visualizar_livro()
                 livros = [
                     Livro(
@@ -61,12 +61,12 @@ def menu(inicio):
                 ]
                 for livro in livros:
                     print(f'ID do livro: {livro.id} | Título: {livro.titulo_livro} | Autor: {livro.autor} | Qtd: {livro.quantidade_disponivel}')
-            case 5:
+            case '5':
                 id_usuario = int(input('Digite o ID do usuário: '))
                 id_livro_emprestar = int(input('Digite o ID do livro que deseja emprestar:'))
                 print(database.emprestar_livro(id_usuario, id_livro_emprestar))
 
-            case 6:
+            case '6':
                 id_usuario = int(input('Digite o ID do usuário: '))
                 livros_emprestados = database.visualizar_livros_emprestados(id_usuario)
 
@@ -75,9 +75,9 @@ def menu(inicio):
                 else:
                     print('\n--Livros emprestados--')
                     for livro in livros_emprestados:
-                        print(f'ID Livro: {livro[id_livro]} | Titulo: {[titulo_livro]} | Data de entrega: {[data_entrega]}')
+                        print(f'ID Livro: {livro['id_livro']} | Titulo: {livro['titulo_livro']} | Data de entrega: {livro['data_entrega']}')
 
-            case 7: 
+            case '7': 
                 dados_emprestimo = database.visualizar_emprestimo()
                 emprestimos = [
                     Emprestimo(
@@ -96,7 +96,7 @@ def menu(inicio):
                     f"Livro ID: {emprestimo.id_livro} | Data de entrega: {emprestimo.data_entrega} | Status: {emprestimo.status()}"
                     )
 
-            case 8:
+            case '8':
                 print('Até a próxima!')
                 break
 

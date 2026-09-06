@@ -297,18 +297,18 @@ def visualizar_usuario():
     '''Visualiza os usuários cadastrados no banco de dados.
 
         Returns:
-            list[dict]: Lista de dicionários '[{ }]' com os dados (nome, email).
+            list[dict]: Lista de dicionários '[{ }]' com os dados (id_usuario, nome, email).
 
         Examples: 
             >>> visualizar_usuario()
-            [{'nome' : 'John McCallen', 'email' : 'johnmc@gmail.com'}] 
+            [{'id_usuario' : 1, 'nome' : 'John McCallen', 'email' : 'johnmc@gmail.com'}] 
     '''
 
     conn = sqlite3.connect('biblioteca.db')
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute('''
-    SELECT nome, email FROM usuarios
+    SELECT id_usuario, nome, email FROM usuarios
     ''')
     ver_usuarios = cursor.fetchall()
     cursor.close()
