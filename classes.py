@@ -19,3 +19,6 @@ class Emprestimo:
         self.disponibilidade = disponibilidade
         self.id_usuario = id_usuario
         self.id_livro = id_livro
+
+    def status(self):
+        return "Emprestado" if self.disponibilidade == 1 else "Devolvido"
