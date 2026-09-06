@@ -1,6 +1,6 @@
 # Sistema de gerenciamento de biblioteca
 
-Sistema para gerenciamento de livros e usuários em uma biblioteca
+Sistema para gerenciamento de livros, usuários e empréstimos em uma biblioteca
 
 ---
 
@@ -16,7 +16,7 @@ Sistema criado em Python com persistência de dados em SQLite para gestão usuá
 ## Tecnologias
 - Python
 - SQLite
-- Biblioteca padrao `datetime`
+- Biblioteca padrão `datetime`
 
 ## Como executar
 
