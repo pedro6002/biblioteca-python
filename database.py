@@ -334,7 +334,7 @@ def visualizar_livros_emprestados(id_usuario):
     cursor.execute('''
         SELECT livros.id_livro, livros.titulo_livro, emprestimo.data_entrega
         FROM emprestimo
-        JOIN livros ON emprestimo.id_livro = livro.id_livro
+        JOIN livros ON emprestimo.id_livro = livros.id_livro
         WHERE emprestimo.id_usuario = ? AND emprestimo.disponibilidade = 1
     ''', (id_usuario,))
 
