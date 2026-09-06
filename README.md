@@ -28,7 +28,7 @@ Sistema criado em Python com persistência de dados em SQLite para gestão usuá
 
 1. Clone o repositório:
 ```bash
-git clone [https://github.com/pedro6002/biblioteca-python.git](https://github.com/pedro6002/biblioteca-python.git)
+git clone https://github.com/pedro6002/biblioteca-python.git
 cd biblioteca-python
 ```
 2. Execute o sistema:
