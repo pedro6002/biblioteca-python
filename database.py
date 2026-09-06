@@ -2,6 +2,11 @@ from datetime import datetime, timedelta
 import sqlite3
 
 def criar_tabelas():
+    '''Cria tabelas e o banco de dados no SQLite.
+    
+    Returns: 
+        str: Mensagem de confirmação de tabela e banco de dados criados.
+    '''
     
     #Cria uma conexão com o sqlite e cria a tabela "biblioteca" caso ela não exista
     conn = sqlite3.connect('biblioteca.db')
@@ -51,6 +56,19 @@ def criar_tabelas():
     return 'Banco de dados e tabela criadas com sucesso!'
 
 def cadastrar_usuario(nome, email):
+    '''Realiza o cadastro do usuário e salva na tabela usuarios.
+
+        Args:
+            nome (str): Nome completo do usuário a ser cadastrado.
+            email (str): Email do usuário a ser cadastrado.
+        
+        Returns:
+            str: Mensagem de confirmação de cadastro de usuário.
+
+        Examples:
+            >>> cadastrar_usuario("John McCallen", "johnmc@gmail.com")
+            'Usuário cadastrado com sucesso!'
+    '''
 
     conn = sqlite3.connect('biblioteca.db')
     cursor = conn.cursor()
@@ -69,6 +87,18 @@ def cadastrar_usuario(nome, email):
     return 'Usuário cadastrado com sucesso!'
 
 def verificar_multa(id_usuario):
+    '''Faz a verificação de multas pendentes do usuário na coluna 'multa' da tabela emprestimo.
+    
+        Args:
+            id_usuario (int): ID do usuário cadastrado.
+
+        Returns:
+            float: valor da multa do usuário.
+        
+        Examples:
+            >>> verificar_multa(1)
+            1.5
+    '''
 
     conn = sqlite3.connect('biblioteca.db')
     cursor = conn.cursor()
@@ -85,6 +115,29 @@ def verificar_multa(id_usuario):
     return checagem if checagem else 0.0
 
 def emprestar_livro(id_usuario, id_livro):
+    '''Faz o empréstimo do livro para o usuário.
+
+        Caso o usuário tenha multas pendentes, o empréstimo será negado, após isso,
+        é feita a verificação do usuário já ter o mesmo livro emprestado no seu nome 
+        e por fim, faz a verificação do livro estar disponível no estoque e atualiza a quantidade disponível do livro para 0.
+
+        Args:
+            id_usuario (int): ID do usuário cadastrado.
+            id_livro (int): ID do livro cadastrado.
+        
+        Returns:
+            str: Mensagem de confirmação que o livro foi emprestado.
+        
+        Examples:
+            >>> emprestar_livro(1,1)
+            'Não foi possivel realizar o empréstimo, o usuário possui multa de 3.00 reais.'
+
+            >>> emprestar_livro(2,4)
+            'O livro já está emprestado no seu nome!'
+
+            >>> emprestar livro(3,5)
+            'Livro emprestado com sucesso!'
+    '''
 
     #Função para colocar data, evitando do usuário colocar data de entrega como parâmetro
     data_entrega = (datetime.now() + timedelta(days=7)).strftime('%d-%m-%Y')
@@ -133,6 +186,19 @@ def emprestar_livro(id_usuario, id_livro):
     return 'Livro emprestado com sucesso!'
 
 def devolver_livro(id_usuario, id_livro):
+    '''Função para devolver o livro de volta para o sistema e 'retirar' o livro do usuário.
+
+        Args:
+            id_usuario (int): ID do usuário cadastrado.
+            id_livro (int): ID do livro cadastrado.
+        
+        Returns:
+            str: Mensagem de confirmação de devolução do livro.
+
+        Examples:
+            >>> devolver_livro(3,5)
+            'Livro devolvido com sucesso!'
+    '''
 
     conn = sqlite3.connect('biblioteca.db')
     cursor = conn.cursor()
@@ -159,6 +225,19 @@ def devolver_livro(id_usuario, id_livro):
     return 'Livro devolvido com sucesso!' 
 
 def cadastrar_livro(titulo_livro, autor):
+    '''Cadastra o livro na tabela livros.
+
+        Args:
+            titulo_livro (str):
+            autor (str):
+
+        Returns:
+            str: Mensagem de confirmação do cadastro do livro.
+        
+        Examples:
+            >>> cadastrar_livro('A república', 'Platão')
+            'Livro cadastrado com sucesso!'
+    '''
 
     conn = sqlite3.connect('biblioteca.db')
     cursor = conn.cursor()
@@ -169,6 +248,15 @@ def cadastrar_livro(titulo_livro, autor):
     return 'Livro cadastrado com sucesso!'  
 
 def visualizar_livro():
+    '''Lista os livros disponíveis no banco de dados.
+
+        Returns:
+            list[dict]: Lista de dicionários '[{ }]' com os dados (id_livro, autor, titulo_livro, quantidade_disponivel). 
+
+        Examples:
+            >>> visualizar_livro()
+            [{'id_livro' : 5, 'autor' : 'Platão', 'titulo_livro' : 'A república', 'quantidade_disponivel' : 0}]
+    '''
 
     conn = sqlite3.connect('biblioteca.db')
 
@@ -185,6 +273,15 @@ def visualizar_livro():
     return [dict(leituras) for leituras in leitura]
 
 def visualizar_emprestimo():
+    '''Visualiza os empréstimos (ativos ou não) no banco de dados.
+
+        Returns:
+            list[dict]: Lista de dicionários '[{ }]' com os dados (id_emprestimo, id_usuario, id_livro, data_entrega, multa, disponibilidade).
+        
+        Examples:
+            >>> visualizar_emprestimo()
+            [{'id_emprestimo' : 1, 'id_usuario' : 3, 'id_livro' : 5, 'data_entrega' : '12-09-2026', 'multa' : 0.0, 'disponibilidade' : 1}]
+    '''
 
     conn = sqlite3.connect('biblioteca.db')
     conn.row_factory = sqlite3.Row
@@ -197,6 +294,15 @@ def visualizar_emprestimo():
     return [dict(visualizacoes) for visualizacoes in visualizacao]
 
 def visualizar_usuario():
+    '''Visualiza os usuários cadastrados no banco de dados.
+
+        Returns:
+            list[dict]: Lista de dicionários '[{ }]' com os dados (nome, email).
+
+        Examples: 
+            >>> visualizar_usuario()
+            [{'nome' : 'John McCallen', 'email' : 'johnmc@gmail.com'}] 
+    '''
 
     conn = sqlite3.connect('biblioteca.db')
     conn.row_factory = sqlite3.Row
