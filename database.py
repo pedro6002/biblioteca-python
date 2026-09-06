@@ -228,8 +228,8 @@ def cadastrar_livro(titulo_livro, autor):
     '''Cadastra o livro na tabela livros.
 
         Args:
-            titulo_livro (str):
-            autor (str):
+            titulo_livro (str): Título do livro que deseja cadastrar
+            autor (str): Autor do livro que deseja cadastrar
 
         Returns:
             str: Mensagem de confirmação do cadastro do livro.
@@ -317,7 +317,7 @@ def visualizar_usuario():
 def visualizar_livros_emprestados(id_usuario):
     '''Visualiza os livros emprestados do usuário
 
-        Args: id_usuario (int)
+        Args: id_usuario (int) = ID do usuário que deseja consultar os livros emprestados
 
         Returns:
             list[dict]: Lista de dicionários '[{ }]' com os dados (id_livro, titulo_livro, data_entrega)
