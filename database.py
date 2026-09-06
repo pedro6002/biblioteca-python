@@ -7,7 +7,7 @@ def criar_tabelas():
     conn = sqlite3.connect('biblioteca.db')
 
     #Ativa as chaves estrangeiras (são desativadas por padrão) antes de abrir o banco de dados
-    conn.execute('PRAGMA foreign_keys = ON;')
+    conn.execute('PRAGMA foreign_keys = ON')
 
     #Cria um cursor para realizar os comandos no SQL 
     cursor = conn.cursor()
@@ -55,14 +55,14 @@ def cadastrar_usuario(nome, email):
     conn = sqlite3.connect('biblioteca.db')
     cursor = conn.cursor()
 
-    cursor.execute('SELECT email FROM usuariosWHERE email = ?', (email,)
+    cursor.execute('SELECT email FROM usuarios WHERE email = ?', (email,)
     )
     usuario_cadastrado = cursor.fetchone()
     if usuario_cadastrado:
         conn.close()
         return 'O usuário com esse email já existe!'
 
-    cursor.execute('INSERT INTO usuarios(nome, email) VALUES (?, ?)',(nome, email)
+    cursor.execute('INSERT INTO usuarios(nome, email) VALUES (?, ?)', (nome, email)
     )
     conn.commit()
     conn.close()
@@ -190,7 +190,7 @@ def visualizar_emprestimo():
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute('''
-    SELECT id_emprestimo, id_livro, data_entrega, multa, disponibilidade FROM emprestimo
+    SELECT id_emprestimo, id_usuario, id_livro, data_entrega, multa, disponibilidade FROM emprestimo
     ''')
     visualizacao = cursor.fetchall()
     cursor.close()
