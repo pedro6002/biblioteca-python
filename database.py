@@ -267,7 +267,7 @@ def visualizar_livro():
     SELECT id_livro, autor, titulo_livro, quantidade_disponivel FROM livros
     ''')
     leitura = cursor.fetchall()
-    cursor.close()
+    conn.close()
 
     #Transforma os valores da tabela [( )] em dicionario { }
     return [dict(leituras) for leituras in leitura]
@@ -290,7 +290,7 @@ def visualizar_emprestimo():
     SELECT id_emprestimo, id_usuario, id_livro, data_entrega, multa, disponibilidade FROM emprestimo
     ''')
     visualizacao = cursor.fetchall()
-    cursor.close()
+    conn.close()
     return [dict(visualizacoes) for visualizacoes in visualizacao]
 
 def visualizar_usuario():
@@ -313,3 +313,31 @@ def visualizar_usuario():
     ver_usuarios = cursor.fetchall()
     cursor.close()
     return [dict(visualizar) for visualizar in ver_usuarios]
+
+def visualizar_livros_emprestados(id_usuario):
+    '''Visualiza os livros emprestados do usuário
+
+        Args: id_usuario (int)
+
+        Returns:
+            list[dict]: Lista de dicionários '[{ }]' com os dados (id_livro, titulo_livro, data_entrega)
+        
+        Examples:
+            >>> visualizar_livros_emprestados(3)
+            [{'id_livro' : 5, 'titulo_livro' : 'A república', 'data_entrega' : '12-09-2026'}]   
+    '''
+
+    conn = sqlite3.connect("biblioteca.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    cursor.execute('''
+        SELECT livros.id_livro, livros.titulo_livro, emprestimo.data_entrega
+        FROM emprestimo
+        JOIN livros ON emprestimo.id_livro = livro.id_livro
+        WHERE emprestimo.id_usuario = ? AND emprestimo.disponibilidade = 1
+    ''', (id_usuario,))
+
+    ver_emprestimos = cursor.fetchall()
+    conn.close()
+    return [dict(ver) for ver in ver_emprestimos]
